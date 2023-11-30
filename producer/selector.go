@@ -18,6 +18,7 @@ limitations under the License.
 package producer
 
 import (
+	"github.com/apache/rocketmq-client-go/v2/rlog"
 	"hash/fnv"
 	"math/rand"
 	"sync"
@@ -38,6 +39,9 @@ func NewManualQueueSelector() QueueSelector {
 }
 
 func (manualQueueSelector) Select(message *primitive.Message, queues []*primitive.MessageQueue, lastBrokerName string) *primitive.MessageQueue {
+	if message.Queue == nil {
+		rlog.Error("producer queue selector is manual but no queue value in message", nil)
+	}
 	return message.Queue
 }
 

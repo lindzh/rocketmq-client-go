@@ -33,6 +33,10 @@ import (
 	jsoniter "github.com/json-iterator/go"
 )
 
+type KVTable struct {
+	Table map[string]string `json:"table"`
+}
+
 type FindBrokerResult struct {
 	BrokerAddr    string
 	Slave         bool

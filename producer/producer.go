@@ -51,6 +51,19 @@ type defaultProducer struct {
 	ShutdownOnce sync.Once
 }
 
+func NewBlankProducer(opts ...Option) (*defaultProducer, error) {
+	defaultOpts := defaultProducerOptions()
+	for _, apply := range opts {
+		apply(&defaultOpts)
+	}
+	producer := &defaultProducer{
+		group:      defaultOpts.GroupName,
+		callbackCh: make(chan interface{}),
+		options:    defaultOpts,
+	}
+	return producer, nil
+}
+
 func NewDefaultProducer(opts ...Option) (*defaultProducer, error) {
 	defaultOpts := defaultProducerOptions()
 	for _, apply := range opts {
@@ -507,6 +520,11 @@ func (p *defaultProducer) tryCompressMsg(msg *primitive.Message) bool {
 }
 
 func (p *defaultProducer) buildSendRequest(mq *primitive.MessageQueue,
+	msg *primitive.Message) *remote.RemotingCommand {
+	return p.BuildSendRequest(mq, msg)
+}
+
+func (p *defaultProducer) BuildSendRequest(mq *primitive.MessageQueue,
 	msg *primitive.Message) *remote.RemotingCommand {
 	if !msg.Batch && msg.GetProperty(primitive.PropertyUniqueClientMessageIdKeyIndex) == "" {
 		msg.WithProperty(primitive.PropertyUniqueClientMessageIdKeyIndex, primitive.CreateUniqID())

@@ -30,6 +30,9 @@ const (
 	ReqQueryConsumerOffset           = int16(14)
 	ReqUpdateConsumerOffset          = int16(15)
 	ReqCreateTopic                   = int16(17)
+	ReqUpdateBrokerConfig            = int16(25)
+	ReqGetBrokerConfig               = int16(26)
+	ReqGetBrokerRuntimeInfo          = int16(28)
 	ReqSearchOffsetByTimestamp       = int16(29)
 	ReqGetMaxOffset                  = int16(30)
 	ReqGetMinOffset                  = int16(31)
@@ -40,6 +43,9 @@ const (
 	ReqGetConsumerListByGroup        = int16(38)
 	ReqLockBatchMQ                   = int16(41)
 	ReqUnlockBatchMQ                 = int16(42)
+	ReqPutKVConfig                   = int16(100)
+	ReqGetKVConfig                   = int16(101)
+	ReqDeleteKVConfig                = int16(102)
 	ReqGetRouteInfoByTopic           = int16(105)
 	ReqGetBrokerClusterInfo          = int16(106)
 	ReqSendBatchMessage              = int16(320)
@@ -51,12 +57,90 @@ const (
 	ReqDeleteTopicInNameSrv          = int16(216)
 	ReqResetConsumerOffset           = int16(220)
 	ReqGetConsumerStatsFromClient    = int16(221)
+	ReqUpdateBrokerRole              = int16(299)
 	ReqGetConsumerRunningInfo        = int16(307)
 	ReqConsumeMessageDirectly        = int16(309)
 	ReqSendReplyMessage              = int16(324)
 	ReqSendReplyMessageV2            = int16(325)
 	ReqPushReplyMessageToClient      = int16(326)
 )
+
+type GetBrokerRuntimeInfoRequestHeader struct {
+	NeedEarliestTime bool
+	NeedDiskCheck    bool
+}
+
+func (header *GetBrokerRuntimeInfoRequestHeader) Encode() map[string]string {
+	maps := make(map[string]string)
+	maps["needEarliestTime"] = strconv.FormatBool(header.NeedEarliestTime)
+	maps["needDiskCheck"] = strconv.FormatBool(header.NeedDiskCheck)
+	return maps
+}
+
+type GetClusterListRequestHeader struct {
+	Cluster string
+}
+
+func (header *GetClusterListRequestHeader) Encode() map[string]string {
+	maps := make(map[string]string)
+	maps["cluster"] = header.Cluster
+	return maps
+}
+
+type UpdateBrokerRoleRequestHeader struct {
+	BrokerRole string
+}
+
+func (header *UpdateBrokerRoleRequestHeader) Encode() map[string]string {
+	maps := make(map[string]string)
+	maps["brokerRole"] = header.BrokerRole
+	return maps
+}
+
+type PutKVConfigRequestHeader struct {
+	Namespace string
+	Key       string
+	Value     string
+}
+
+func (request *PutKVConfigRequestHeader) Encode() map[string]string {
+	maps := make(map[string]string)
+	maps["namespace"] = request.Namespace
+	maps["key"] = request.Key
+	maps["value"] = request.Value
+	return maps
+}
+
+type GetKVConfigRequestHeader struct {
+	Namespace string
+	Key       string
+}
+
+func (request *GetKVConfigRequestHeader) Encode() map[string]string {
+	maps := make(map[string]string)
+	maps["namespace"] = request.Namespace
+	maps["key"] = request.Key
+	return maps
+}
+
+type DeleteKVConfigRequestHeader struct {
+	Namespace string
+	Key       string
+}
+
+func (request *DeleteKVConfigRequestHeader) Encode() map[string]string {
+	maps := make(map[string]string)
+	maps["namespace"] = request.Namespace
+	maps["key"] = request.Key
+	return maps
+}
+
+type NoParameterRequestHeader struct {
+}
+
+func (request *NoParameterRequestHeader) Encode() map[string]string {
+	return make(map[string]string)
+}
 
 type SendMessageRequestHeader struct {
 	ProducerGroup         string

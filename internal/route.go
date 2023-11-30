@@ -428,7 +428,7 @@ func (s *namesrvs) queryTopicRouteInfoFromServer(topic string) (*TopicRouteData,
 		}
 		routeData := &TopicRouteData{}
 
-		err = routeData.decode(string(response.Body))
+		err = routeData.Decode(string(response.Body))
 		if err != nil {
 			rlog.Warning("decode TopicRouteData error: %s", map[string]interface{}{
 				rlog.LogKeyUnderlayError: err,
@@ -535,7 +535,7 @@ type TopicRouteData struct {
 	BrokerDataList []*BrokerData `json:"brokerDatas"`
 }
 
-func (routeData *TopicRouteData) decode(data string) error {
+func (routeData *TopicRouteData) Decode(data string) error {
 	res := gjson.Parse(data)
 	err := jsoniter.Unmarshal([]byte(res.Get("queueDatas").String()), &routeData.QueueDataList)
 

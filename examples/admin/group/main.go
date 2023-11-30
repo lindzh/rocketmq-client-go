@@ -38,7 +38,6 @@ func main() {
 			SecretKey: "12345678",
 		}),
 	)
-
 	// group list
 	result, err := testAdmin.GetAllSubscriptionGroup(context.Background(), brokerAddr, 3*time.Second)
 	if err != nil {

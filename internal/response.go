@@ -17,6 +17,13 @@ limitations under the License.
 
 package internal
 
+import (
+	jsoniter "github.com/json-iterator/go"
+	"github.com/tidwall/gjson"
+	"strconv"
+	"strings"
+)
+
 const (
 	ResSuccess              = int16(0)
 	ResError                = int16(1)
@@ -49,4 +56,51 @@ type PullMessageResponse struct {
 	NextBeginOffset      int64
 	MinOffset            int64
 	MaxOffset            int64
+}
+
+type GetKVConfigResponseHeader struct {
+	Value string
+}
+
+func (header *GetKVConfigResponseHeader) Decode(properties map[string]string) {
+	header.Value = properties["value"]
+}
+
+type ClusterInfo struct {
+	BrokerAddrTable  map[string]BrokerData `json:"brokerAddrTable"`
+	ClusterAddrTable map[string][]string   `json:"clusterAddrTable"`
+}
+
+func (info *ClusterInfo) Decode(data string) error {
+	res := gjson.Parse(data)
+	info.ClusterAddrTable = make(map[string][]string)
+	err := jsoniter.Unmarshal([]byte(res.Get("clusterAddrTable").String()), &info.ClusterAddrTable)
+	if err != nil {
+		return err
+	}
+
+	bds := res.Get("brokerAddrTable").Map()
+	info.BrokerAddrTable = make(map[string]BrokerData)
+	for k, v := range bds {
+		bd := &BrokerData{
+			BrokerName:      v.Get("brokerName").String(),
+			Cluster:         v.Get("cluster").String(),
+			BrokerAddresses: make(map[int64]string, 0),
+		}
+		addrs := v.Get("brokerAddrs").String()
+		strs := strings.Split(addrs[1:len(addrs)-1], ",")
+		if strs != nil {
+			for _, str := range strs {
+				i := strings.Index(str, ":")
+				if i < 0 {
+					continue
+				}
+				brokerId := strings.ReplaceAll(str[0:i], "\"", "")
+				id, _ := strconv.ParseInt(brokerId, 10, 64)
+				bd.BrokerAddresses[id] = strings.Replace(str[i+1:], "\"", "", -1)
+			}
+		}
+		info.BrokerAddrTable[k] = *bd
+	}
+	return nil
 }

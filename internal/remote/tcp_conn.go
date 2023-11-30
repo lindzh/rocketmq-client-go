@@ -19,11 +19,10 @@ package remote
 import (
 	"context"
 	"crypto/tls"
+	"go.uber.org/atomic"
 	"net"
 	"sync"
 	"time"
-
-	"go.uber.org/atomic"
 )
 
 // TODO: Adding TCP Connections Pool, https://github.com/apache/rocketmq-client-go/v2/issues/298
