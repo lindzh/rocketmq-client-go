@@ -10,7 +10,7 @@ import (
 	"time"
 )
 
-const DOMAIN = "http://jmenv.igame.service.163.org/rocketmq/nsaddr_dev"
+const DOMAIN = "http://jmenv.taobao.net/rocketmq/nsaddr_dev"
 const TIMEOUT = time.Duration(3 * time.Second)
 
 func GetAdminExt() (*AdminExt, error) {
@@ -109,7 +109,7 @@ func TestBrokerRuntimeStats(t *testing.T) {
 	defer admin.Close()
 	list := admin.FetchNameSrvList()
 	fmt.Printf("namesrv list: %v\r\n", list)
-	addr := "10.197.112.198:10911"
+	addr := "10.22.33.198:10911"
 	stats, err := admin.GetBrokerRuntimeStats(&addr, true, true, TIMEOUT)
 	if err != nil {
 		t.Fatal(err)
@@ -126,7 +126,7 @@ func TestUpdateBrokerRole(t *testing.T) {
 	defer admin.Close()
 	list := admin.FetchNameSrvList()
 	fmt.Printf("namesrv list: %v\r\n", list)
-	addr := "10.197.112.198:10911"
+	addr := "10.22.33.44:10911"
 	err1 := admin.UpdateBrokerRole(&addr, "ASYNC_MASTER", TIMEOUT)
 	if err1 != nil {
 		t.Fatal(err1)
@@ -143,7 +143,7 @@ func TestBrokerConfig(t *testing.T) {
 	defer admin.Close()
 	list := admin.FetchNameSrvList()
 	fmt.Printf("namesrv list: %v\r\n", list)
-	addr := "10.197.112.198:10911"
+	addr := "10.22.33.44:10911"
 	conf, err1 := admin.GetBrokerConfig(&addr, TIMEOUT)
 	if err1 != nil {
 		t.Fatal(err1)
@@ -175,7 +175,7 @@ func TestBrokerConfig(t *testing.T) {
 }
 
 func TestDecodeRoute(t *testing.T) {
-	data := "{\"brokerDatas\":[{\"brokerAddrs\":{1:\"10.197.112.198:10911\"},\"brokerName\":\"devbroker4\",\"cluster\":\"devcluster1\"},{\"brokerAddrs\":{0:\"10.197.112.200:10911\"},\"brokerName\":\"devbroker5\",\"cluster\":\"devcluster1\"}],\"filterServerTable\":{},\"queueDatas\":[{\"brokerName\":\"devbroker4\",\"perm\":6,\"readQueueNums\":8,\"topicSynFlag\":0,\"writeQueueNums\":8},{\"brokerName\":\"devbroker5\",\"perm\":6,\"readQueueNums\":8,\"topicSynFlag\":0,\"writeQueueNums\":8}]}\n"
+	data := "{\"brokerDatas\":[{\"brokerAddrs\":{1:\"10.22.33.198:10911\"},\"brokerName\":\"devbroker4\",\"cluster\":\"devcluster1\"},{\"brokerAddrs\":{0:\"10.22.33.200:10911\"},\"brokerName\":\"devbroker5\",\"cluster\":\"devcluster1\"}],\"filterServerTable\":{},\"queueDatas\":[{\"brokerName\":\"devbroker4\",\"perm\":6,\"readQueueNums\":8,\"topicSynFlag\":0,\"writeQueueNums\":8},{\"brokerName\":\"devbroker5\",\"perm\":6,\"readQueueNums\":8,\"topicSynFlag\":0,\"writeQueueNums\":8}]}\n"
 	routeData := &internal.TopicRouteData{}
 	err := routeData.Decode(data)
 	if err != nil {
@@ -183,7 +183,7 @@ func TestDecodeRoute(t *testing.T) {
 	}
 	fmt.Printf("decode result: %v\r\n", routeData)
 
-	data1 := "{\"brokerDatas\":[{\"brokerAddrs\":{\"1\":\"10.197.112.198:10911\"},\"brokerName\":\"devbroker4\",\"cluster\":\"devcluster1\"},{\"brokerAddrs\":{\"0\":\"10.197.112.200:10911\"},\"brokerName\":\"devbroker5\",\"cluster\":\"devcluster1\"}],\"filterServerTable\":{},\"queueDatas\":[{\"brokerName\":\"devbroker4\",\"perm\":6,\"readQueueNums\":8,\"topicSynFlag\":0,\"writeQueueNums\":8},{\"brokerName\":\"devbroker5\",\"perm\":6,\"readQueueNums\":8,\"topicSynFlag\":0,\"writeQueueNums\":8}]}\n"
+	data1 := "{\"brokerDatas\":[{\"brokerAddrs\":{\"1\":\"10.22.33.198:10911\"},\"brokerName\":\"devbroker4\",\"cluster\":\"devcluster1\"},{\"brokerAddrs\":{\"0\":\"10.22.33.200:10911\"},\"brokerName\":\"devbroker5\",\"cluster\":\"devcluster1\"}],\"filterServerTable\":{},\"queueDatas\":[{\"brokerName\":\"devbroker4\",\"perm\":6,\"readQueueNums\":8,\"topicSynFlag\":0,\"writeQueueNums\":8},{\"brokerName\":\"devbroker5\",\"perm\":6,\"readQueueNums\":8,\"topicSynFlag\":0,\"writeQueueNums\":8}]}\n"
 	routeData1 := &internal.TopicRouteData{}
 	err1 := routeData1.Decode(data1)
 	if err1 != nil {
@@ -200,7 +200,7 @@ func TestAdminSendMessage(t *testing.T) {
 	defer admin.Close()
 	list := admin.FetchNameSrvList()
 	fmt.Printf("namesrv list: %v\r\n", list)
-	addr := "10.197.112.198:10911"
+	addr := "10.22.33.44:10911"
 	msg := &primitive.Message{
 		Topic: "rocketmqx_client_normal_test",
 		Body:  []byte("hello rocketmqx"),
