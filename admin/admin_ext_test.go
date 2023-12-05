@@ -74,7 +74,7 @@ func TestBrokerCluster(t *testing.T) {
 	defer admin.Close()
 	list := admin.FetchNameSrvList()
 	addr := list[0]
-	brokerCluster, err := admin.GetBrokerClusterInfo(&addr, "devcluster1", TIMEOUT)
+	brokerCluster, err := admin.GetBrokerClusterInfo(&addr, "cloud_native_cluster1", TIMEOUT)
 	if err != nil {
 		t.Fatal(err)
 		fmt.Printf("GetBrokerClusterInfo error: %v\r\n", err)
