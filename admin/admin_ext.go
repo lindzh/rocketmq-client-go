@@ -235,3 +235,24 @@ func (a *AdminExt) SyncSendMessage(ctx context.Context, brokerAddr *string, mq *
 	resp := primitive.NewSendResult()
 	return resp, a.cli.ProcessSendResponse(mq.BrokerName, res, resp, msg)
 }
+
+func (a *AdminExt) CreateTopic(ctx context.Context, brokerAddr *string, topic string, queue int, perm int, timeoutMills time.Duration) error {
+	request := &internal.CreateTopicRequestHeader{
+		Topic:           topic,
+		ReadQueueNums:   queue,
+		WriteQueueNums:  queue,
+		Perm:            perm,
+		Order:           false,
+		TopicFilterType: "SINGLE_TAG",
+		TopicSysFlag:    0,
+	}
+	cmd := remote.NewRemotingCommand(internal.ReqCreateTopic, request, nil)
+	res, err := a.cli.InvokeSync(ctx, *brokerAddr, cmd, timeoutMills)
+	if err != nil {
+		return err
+	}
+	if res.Code != internal.ResSuccess {
+		return fmt.Errorf("create topic fail broker response code: %d, remarks: %s", res.Code, res.Remark)
+	}
+	return nil
+}
