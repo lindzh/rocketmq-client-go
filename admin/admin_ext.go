@@ -257,30 +257,34 @@ func (a *AdminExt) CreateTopic(brokerAddr *string, topic string, queue int, perm
 	return nil
 }
 
-func (a *AdminExt) SyncTopicConfigFromBroker(fromBrokerAddr string, brokerAddr *string, timeoutMills time.Duration) error {
+func (a *AdminExt) SyncTopicConfigFromBroker(fromBrokerAddr string, brokerAddr *string, timeoutMills time.Duration) (int, error) {
 	request := &internal.SyncTopicConfigRequestHeader{}
 	request.FromBrokerAddr = fromBrokerAddr
 	cmd := remote.NewRemotingCommand(internal.ReqSyncBrokerTopicConfig, request, nil)
 	res, err := a.cli.InvokeSync(context.Background(), *brokerAddr, cmd, timeoutMills)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	if res.Code != internal.ResSuccess {
-		return fmt.Errorf("sync topic config from %s fail broker %s, response code: %d, remarks: %s", fromBrokerAddr, *brokerAddr, res.Code, res.Remark)
+		return 0, fmt.Errorf("sync topic config from %s fail broker %s, response code: %d, remarks: %s", fromBrokerAddr, *brokerAddr, res.Code, res.Remark)
 	}
-	return nil
+	header := &internal.SyncCountResponseHeader{}
+	header.Decode(res.ExtFields)
+	return header.Count, nil
 }
 
-func (a *AdminExt) SyncSubscriptionGroupConfigFromBroker(fromBrokerAddr string, brokerAddr *string, timeoutMills time.Duration) error {
+func (a *AdminExt) SyncSubscriptionGroupConfigFromBroker(fromBrokerAddr string, brokerAddr *string, timeoutMills time.Duration) (int, error) {
 	request := &internal.SyncSubscriptionGroupConfigRequestHeader{}
 	request.FromBrokerAddr = fromBrokerAddr
 	cmd := remote.NewRemotingCommand(internal.ReqSyncBrokerSubscriptionGroupConfig, request, nil)
 	res, err := a.cli.InvokeSync(context.Background(), *brokerAddr, cmd, timeoutMills)
 	if err != nil {
-		return err
+		return 0, err
 	}
 	if res.Code != internal.ResSuccess {
-		return fmt.Errorf("sync sub group config from %s fail broker %s, response code: %d, remarks: %s", fromBrokerAddr, *brokerAddr, res.Code, res.Remark)
+		return 0, fmt.Errorf("sync sub group config from %s fail broker %s, response code: %d, remarks: %s", fromBrokerAddr, *brokerAddr, res.Code, res.Remark)
 	}
-	return nil
+	header := &internal.SyncCountResponseHeader{}
+	header.Decode(res.ExtFields)
+	return header.Count, nil
 }

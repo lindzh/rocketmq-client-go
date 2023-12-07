@@ -66,6 +66,14 @@ func (header *GetKVConfigResponseHeader) Decode(properties map[string]string) {
 	header.Value = properties["value"]
 }
 
+type SyncCountResponseHeader struct {
+	Count int
+}
+
+func (header *SyncCountResponseHeader) Decode(properties map[string]string) {
+	header.Count, _ = strconv.Atoi(properties["count"])
+}
+
 type ClusterInfo struct {
 	BrokerAddrTable  map[string]BrokerData `json:"brokerAddrTable"`
 	ClusterAddrTable map[string][]string   `json:"clusterAddrTable"`
