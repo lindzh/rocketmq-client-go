@@ -222,13 +222,13 @@ func (a *AdminExt) GetTopicRoute(nameSrvAddr *string, topic string, timeoutMills
 	return routeData, nil
 }
 
-func (a *AdminExt) SyncSendMessage(ctx context.Context, brokerAddr *string, mq *primitive.MessageQueue, msg *primitive.Message, timeoutMills time.Duration) (*primitive.SendResult, error) {
+func (a *AdminExt) SyncSendMessage(brokerAddr *string, mq *primitive.MessageQueue, msg *primitive.Message, timeoutMills time.Duration) (*primitive.SendResult, error) {
 	p, err := producer.NewBlankProducer(producer.WithGroupName("PID_admin_ext"))
 	if err != nil {
 		return nil, err
 	}
 	req := p.BuildSendRequest(mq, msg)
-	res, err1 := a.cli.InvokeSync(ctx, *brokerAddr, req, timeoutMills)
+	res, err1 := a.cli.InvokeSync(context.Background(), *brokerAddr, req, timeoutMills)
 	if err1 != nil {
 		return nil, err1
 	}
@@ -236,7 +236,7 @@ func (a *AdminExt) SyncSendMessage(ctx context.Context, brokerAddr *string, mq *
 	return resp, a.cli.ProcessSendResponse(mq.BrokerName, res, resp, msg)
 }
 
-func (a *AdminExt) CreateTopic(ctx context.Context, brokerAddr *string, topic string, queue int, perm int, timeoutMills time.Duration) error {
+func (a *AdminExt) CreateTopic(brokerAddr *string, topic string, queue int, perm int, timeoutMills time.Duration) error {
 	request := &internal.CreateTopicRequestHeader{
 		Topic:           topic,
 		ReadQueueNums:   queue,
@@ -247,12 +247,40 @@ func (a *AdminExt) CreateTopic(ctx context.Context, brokerAddr *string, topic st
 		TopicSysFlag:    0,
 	}
 	cmd := remote.NewRemotingCommand(internal.ReqCreateTopic, request, nil)
-	res, err := a.cli.InvokeSync(ctx, *brokerAddr, cmd, timeoutMills)
+	res, err := a.cli.InvokeSync(context.Background(), *brokerAddr, cmd, timeoutMills)
 	if err != nil {
 		return err
 	}
 	if res.Code != internal.ResSuccess {
 		return fmt.Errorf("create topic fail broker response code: %d, remarks: %s", res.Code, res.Remark)
+	}
+	return nil
+}
+
+func (a *AdminExt) SyncTopicConfigFromBroker(fromBrokerAddr string, brokerAddr *string, timeoutMills time.Duration) error {
+	request := &internal.SyncTopicConfigRequestHeader{}
+	request.FromBrokerAddr = fromBrokerAddr
+	cmd := remote.NewRemotingCommand(internal.ReqSyncBrokerTopicConfig, request, nil)
+	res, err := a.cli.InvokeSync(context.Background(), *brokerAddr, cmd, timeoutMills)
+	if err != nil {
+		return err
+	}
+	if res.Code != internal.ResSuccess {
+		return fmt.Errorf("sync topic config from %s fail broker %s, response code: %d, remarks: %s", fromBrokerAddr, *brokerAddr, res.Code, res.Remark)
+	}
+	return nil
+}
+
+func (a *AdminExt) SyncSubscriptionGroupConfigFromBroker(fromBrokerAddr string, brokerAddr *string, timeoutMills time.Duration) error {
+	request := &internal.SyncSubscriptionGroupConfigRequestHeader{}
+	request.FromBrokerAddr = fromBrokerAddr
+	cmd := remote.NewRemotingCommand(internal.ReqSyncBrokerSubscriptionGroupConfig, request, nil)
+	res, err := a.cli.InvokeSync(context.Background(), *brokerAddr, cmd, timeoutMills)
+	if err != nil {
+		return err
+	}
+	if res.Code != internal.ResSuccess {
+		return fmt.Errorf("sync sub group config from %s fail broker %s, response code: %d, remarks: %s", fromBrokerAddr, *brokerAddr, res.Code, res.Remark)
 	}
 	return nil
 }

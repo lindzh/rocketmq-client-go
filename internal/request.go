@@ -24,46 +24,68 @@ import (
 )
 
 const (
-	ReqSendMessage                   = int16(10)
-	ReqPullMessage                   = int16(11)
-	ReqQueryMessage                  = int16(12)
-	ReqQueryConsumerOffset           = int16(14)
-	ReqUpdateConsumerOffset          = int16(15)
-	ReqCreateTopic                   = int16(17)
-	ReqUpdateBrokerConfig            = int16(25)
-	ReqGetBrokerConfig               = int16(26)
-	ReqGetBrokerRuntimeInfo          = int16(28)
-	ReqSearchOffsetByTimestamp       = int16(29)
-	ReqGetMaxOffset                  = int16(30)
-	ReqGetMinOffset                  = int16(31)
-	ReqViewMessageByID               = int16(33)
-	ReqHeartBeat                     = int16(34)
-	ReqConsumerSendMsgBack           = int16(36)
-	ReqENDTransaction                = int16(37)
-	ReqGetConsumerListByGroup        = int16(38)
-	ReqLockBatchMQ                   = int16(41)
-	ReqUnlockBatchMQ                 = int16(42)
-	ReqPutKVConfig                   = int16(100)
-	ReqGetKVConfig                   = int16(101)
-	ReqDeleteKVConfig                = int16(102)
-	ReqGetRouteInfoByTopic           = int16(105)
-	ReqGetBrokerClusterInfo          = int16(106)
-	ReqSendBatchMessage              = int16(320)
-	ReqCheckTransactionState         = int16(39)
-	ReqNotifyConsumerIdsChanged      = int16(40)
-	ReqGetAllSubscriptionGroupConfig = int16(201)
-	ReqGetAllTopicListFromNameServer = int16(206)
-	ReqDeleteTopicInBroker           = int16(215)
-	ReqDeleteTopicInNameSrv          = int16(216)
-	ReqResetConsumerOffset           = int16(220)
-	ReqGetConsumerStatsFromClient    = int16(221)
-	ReqUpdateBrokerRole              = int16(299)
-	ReqGetConsumerRunningInfo        = int16(307)
-	ReqConsumeMessageDirectly        = int16(309)
-	ReqSendReplyMessage              = int16(324)
-	ReqSendReplyMessageV2            = int16(325)
-	ReqPushReplyMessageToClient      = int16(326)
+	ReqSendMessage                       = int16(10)
+	ReqPullMessage                       = int16(11)
+	ReqQueryMessage                      = int16(12)
+	ReqQueryConsumerOffset               = int16(14)
+	ReqUpdateConsumerOffset              = int16(15)
+	ReqCreateTopic                       = int16(17)
+	ReqUpdateBrokerConfig                = int16(25)
+	ReqGetBrokerConfig                   = int16(26)
+	ReqGetBrokerRuntimeInfo              = int16(28)
+	ReqSearchOffsetByTimestamp           = int16(29)
+	ReqGetMaxOffset                      = int16(30)
+	ReqGetMinOffset                      = int16(31)
+	ReqViewMessageByID                   = int16(33)
+	ReqHeartBeat                         = int16(34)
+	ReqConsumerSendMsgBack               = int16(36)
+	ReqENDTransaction                    = int16(37)
+	ReqGetConsumerListByGroup            = int16(38)
+	ReqLockBatchMQ                       = int16(41)
+	ReqUnlockBatchMQ                     = int16(42)
+	ReqPutKVConfig                       = int16(100)
+	ReqGetKVConfig                       = int16(101)
+	ReqDeleteKVConfig                    = int16(102)
+	ReqGetRouteInfoByTopic               = int16(105)
+	ReqGetBrokerClusterInfo              = int16(106)
+	ReqSendBatchMessage                  = int16(320)
+	ReqCheckTransactionState             = int16(39)
+	ReqNotifyConsumerIdsChanged          = int16(40)
+	ReqSyncBrokerTopicConfig             = int16(190)
+	ReqSyncBrokerSubscriptionGroupConfig = int16(191)
+	ReqGetAllSubscriptionGroupConfig     = int16(201)
+	ReqGetAllTopicListFromNameServer     = int16(206)
+	ReqDeleteTopicInBroker               = int16(215)
+	ReqDeleteTopicInNameSrv              = int16(216)
+	ReqResetConsumerOffset               = int16(220)
+	ReqGetConsumerStatsFromClient        = int16(221)
+	ReqUpdateBrokerRole                  = int16(299)
+	ReqGetConsumerRunningInfo            = int16(307)
+	ReqConsumeMessageDirectly            = int16(309)
+	ReqSendReplyMessage                  = int16(324)
+	ReqSendReplyMessageV2                = int16(325)
+	ReqPushReplyMessageToClient          = int16(326)
 )
+
+type SyncTopicConfigRequestHeader struct {
+	FromBrokerAddr string
+}
+
+func (header *SyncTopicConfigRequestHeader) Encode() map[string]string {
+	maps := make(map[string]string)
+	maps["fromBrokerAddr"] = header.FromBrokerAddr
+	return maps
+}
+
+type SyncSubscriptionGroupConfigRequestHeader struct {
+	FromBrokerAddr string
+}
+
+func (header *SyncSubscriptionGroupConfigRequestHeader) Encode() map[string]string {
+	maps := make(map[string]string)
+	maps["fromBrokerAddr"] = header.FromBrokerAddr
+	return maps
+}
 
 type GetBrokerRuntimeInfoRequestHeader struct {
 	NeedEarliestTime bool
