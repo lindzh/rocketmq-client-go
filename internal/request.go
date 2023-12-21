@@ -57,6 +57,7 @@ const (
 	ReqGetAllTopicListFromNameServer     = int16(206)
 	ReqDeleteTopicInBroker               = int16(215)
 	ReqDeleteTopicInNameSrv              = int16(216)
+	ReqGetKvListInNamespace              = int16(219)
 	ReqResetConsumerOffset               = int16(220)
 	ReqGetConsumerStatsFromClient        = int16(221)
 	ReqUpdateBrokerRole                  = int16(299)
@@ -130,6 +131,16 @@ func (request *PutKVConfigRequestHeader) Encode() map[string]string {
 	maps["namespace"] = request.Namespace
 	maps["key"] = request.Key
 	maps["value"] = request.Value
+	return maps
+}
+
+type GetKVListRequestHeader struct {
+	Namespace string
+}
+
+func (request *GetKVListRequestHeader) Encode() map[string]string {
+	maps := make(map[string]string)
+	maps["namespace"] = request.Namespace
 	return maps
 }
 

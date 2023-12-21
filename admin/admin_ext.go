@@ -58,6 +58,26 @@ func (a *AdminExt) FetchNameSrvList() []string {
 	return a.cli.GetNameSrv().AddrList()
 }
 
+func (a *AdminExt) GetKvListInNamespace(nameSrvAddr *string, namespace string, timeoutMills time.Duration) (map[string]string, error) {
+	request := &internal.GetKVListRequestHeader{}
+	request.Namespace = namespace
+	cmd := remote.NewRemotingCommand(internal.ReqGetKvListInNamespace, request, nil)
+	ctx, _ := context.WithTimeout(context.Background(), timeoutMills)
+	res, err := a.cli.InvokeSync(ctx, *nameSrvAddr, cmd, timeoutMills)
+	if err != nil {
+		return nil, err
+	}
+	if res.Code != internal.ResSuccess {
+		return nil, fmt.Errorf("get kv list in namespace response code: %d, remarks: %s", res.Code, res.Remark)
+	}
+	kvTable := &internal.KVTable{}
+	err1 := json.Unmarshal(res.Body, kvTable)
+	if err1 != nil {
+		return nil, err1
+	}
+	return kvTable.Table, nil
+}
+
 func (a *AdminExt) UpdateKvConfig(nameSrvAddr *string, namespace string, key string, value string, timeoutMills time.Duration) error {
 	request := &internal.PutKVConfigRequestHeader{}
 	request.Key = key
