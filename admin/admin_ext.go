@@ -58,6 +58,40 @@ func (a *AdminExt) FetchNameSrvList() []string {
 	return a.cli.GetNameSrv().AddrList()
 }
 
+func (a *AdminExt) RemoveDeletedBrokerName(nameSrvAddr *string, cluster string, brokerName string, timeoutMills time.Duration) error {
+	request := &internal.RemoveDeletedBrokerNameRequestHeader{}
+	request.Cluster = cluster
+	request.BrokerName = brokerName
+	cmd := remote.NewRemotingCommand(internal.ReqRemoveDeletedBrokerNameInNameSrv, request, nil)
+	ctx, _ := context.WithTimeout(context.Background(), timeoutMills)
+	res, err := a.cli.InvokeSync(ctx, *nameSrvAddr, cmd, timeoutMills)
+	if err != nil {
+		return err
+	}
+	if res.Code != internal.ResSuccess {
+		return fmt.Errorf("delete broker %s in name srv %s, response code: %d, remarks: %s", brokerName, *nameSrvAddr, res.Code, res.Remark)
+	}
+	return nil
+}
+
+func (a *AdminExt) DeleteBrokerName(nameSrvAddr *string, cluster string, brokerName string, timeoutMills time.Duration) error {
+	request := &internal.DeleteBrokerNameRequestHeader{}
+	request.Cluster = cluster
+	request.BrokerName = brokerName
+	request.RemoveTopic = true
+	request.RemoveOrderConf = true
+	cmd := remote.NewRemotingCommand(internal.ReqForceDeleteBrokerNameInNameSrv, request, nil)
+	ctx, _ := context.WithTimeout(context.Background(), timeoutMills)
+	res, err := a.cli.InvokeSync(ctx, *nameSrvAddr, cmd, timeoutMills)
+	if err != nil {
+		return err
+	}
+	if res.Code != internal.ResSuccess {
+		return fmt.Errorf("delete broker %s in name srv %s, response code: %d, remarks: %s", brokerName, *nameSrvAddr, res.Code, res.Remark)
+	}
+	return nil
+}
+
 func (a *AdminExt) GetKvListInNamespace(nameSrvAddr *string, namespace string, timeoutMills time.Duration) (map[string]string, error) {
 	request := &internal.GetKVListRequestHeader{}
 	request.Namespace = namespace

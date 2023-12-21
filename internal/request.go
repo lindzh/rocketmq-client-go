@@ -48,6 +48,8 @@ const (
 	ReqDeleteKVConfig                    = int16(102)
 	ReqGetRouteInfoByTopic               = int16(105)
 	ReqGetBrokerClusterInfo              = int16(106)
+	ReqForceDeleteBrokerNameInNameSrv    = int16(116)
+	ReqRemoveDeletedBrokerNameInNameSrv  = int16(117)
 	ReqSendBatchMessage                  = int16(320)
 	ReqCheckTransactionState             = int16(39)
 	ReqNotifyConsumerIdsChanged          = int16(40)
@@ -117,6 +119,34 @@ type UpdateBrokerRoleRequestHeader struct {
 func (header *UpdateBrokerRoleRequestHeader) Encode() map[string]string {
 	maps := make(map[string]string)
 	maps["brokerRole"] = header.BrokerRole
+	return maps
+}
+
+type DeleteBrokerNameRequestHeader struct {
+	Cluster         string
+	BrokerName      string
+	RemoveTopic     bool
+	RemoveOrderConf bool
+}
+
+func (header *DeleteBrokerNameRequestHeader) Encode() map[string]string {
+	maps := make(map[string]string)
+	maps["cluster"] = header.Cluster
+	maps["brokerName"] = header.BrokerName
+	maps["removeTopic"] = strconv.FormatBool(header.RemoveTopic)
+	maps["removeOrderConf"] = strconv.FormatBool(header.RemoveOrderConf)
+	return maps
+}
+
+type RemoveDeletedBrokerNameRequestHeader struct {
+	Cluster    string
+	BrokerName string
+}
+
+func (header *RemoveDeletedBrokerNameRequestHeader) Encode() map[string]string {
+	maps := make(map[string]string)
+	maps["cluster"] = header.Cluster
+	maps["brokerName"] = header.BrokerName
 	return maps
 }
 
