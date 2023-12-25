@@ -51,6 +51,20 @@ func (response *SendMessageResponse) Decode(properties map[string]string) {
 
 }
 
+type SyncNameSrvKVConfigResponseHeader struct {
+	KvNameSpaceCount      int
+	KvConfigCount         int
+	TimedKvNamespaceCount int
+	TimedKvConfigCount    int
+}
+
+func (header *SyncNameSrvKVConfigResponseHeader) Decode(properties map[string]string) {
+	header.KvNameSpaceCount, _ = strconv.Atoi(properties["kvNameSpaceCount"])
+	header.KvConfigCount, _ = strconv.Atoi(properties["kvConfigCount"])
+	header.TimedKvNamespaceCount, _ = strconv.Atoi(properties["timedKvNamespaceCount"])
+	header.TimedKvConfigCount, _ = strconv.Atoi(properties["timedKvConfigCount"])
+}
+
 type PullMessageResponse struct {
 	SuggestWhichBrokerId int64
 	NextBeginOffset      int64

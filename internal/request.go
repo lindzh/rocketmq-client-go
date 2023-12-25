@@ -68,7 +68,21 @@ const (
 	ReqSendReplyMessage                  = int16(324)
 	ReqSendReplyMessageV2                = int16(325)
 	ReqPushReplyMessageToClient          = int16(326)
+	ReqGetNameSrvStatus                  = int16(330)
+	ReqSyncNameSrvKvConfig               = int16(333)
 )
+
+type SyncNameSrvKVConfigRequestHeader struct {
+	FromNameSrvAddr  string
+	SyncTimeoutMills int64
+}
+
+func (header *SyncNameSrvKVConfigRequestHeader) Encode() map[string]string {
+	maps := make(map[string]string)
+	maps["fromNameServerAddr"] = header.FromNameSrvAddr
+	maps["syncTimeoutMillis"] = strconv.FormatInt(header.SyncTimeoutMills, 10)
+	return maps
+}
 
 type SyncTopicConfigRequestHeader struct {
 	FromBrokerAddr string

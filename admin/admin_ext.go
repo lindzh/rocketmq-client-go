@@ -311,6 +311,40 @@ func (a *AdminExt) CreateTopic(brokerAddr *string, topic string, queue int, perm
 	return nil
 }
 
+func (a *AdminExt) GetNameSrvStatus(nameSrvAddr *string, timeoutMills time.Duration) (*internal.NameSrvStatus, error) {
+	cmd := remote.NewRemotingCommand(internal.ReqGetNameSrvStatus, nil, nil)
+	res, err := a.cli.InvokeSync(context.Background(), *nameSrvAddr, cmd, timeoutMills)
+	if err != nil {
+		return nil, err
+	}
+	if res.Code != internal.ResSuccess {
+		return nil, fmt.Errorf("get name srv status fail %s, response code: %d, remarks: %s", *nameSrvAddr, res.Code, res.Remark)
+	}
+	ret := &internal.NameSrvStatus{}
+	err = json.Unmarshal(res.Body, ret)
+	if err != nil {
+		return nil, err
+	}
+	return ret, nil
+}
+
+func (a *AdminExt) SyncKvConfigFromNameSrv(fromNameSrvAddr string, nameSrvAddr *string, timeoutMills time.Duration) (*internal.SyncNameSrvKVConfigResponseHeader, error) {
+	request := &internal.SyncNameSrvKVConfigRequestHeader{}
+	request.FromNameSrvAddr = fromNameSrvAddr
+	request.SyncTimeoutMills = int64(timeoutMills)
+	cmd := remote.NewRemotingCommand(internal.ReqSyncNameSrvKvConfig, request, nil)
+	res, err := a.cli.InvokeSync(context.Background(), *nameSrvAddr, cmd, timeoutMills)
+	if err != nil {
+		return nil, err
+	}
+	if res.Code != internal.ResSuccess {
+		return nil, fmt.Errorf("sync kv config from %s fail name srv %s, response code: %d, remarks: %s", fromNameSrvAddr, *nameSrvAddr, res.Code, res.Remark)
+	}
+	header := &internal.SyncNameSrvKVConfigResponseHeader{}
+	header.Decode(res.ExtFields)
+	return header, nil
+}
+
 func (a *AdminExt) SyncTopicConfigFromBroker(fromBrokerAddr string, brokerAddr *string, timeoutMills time.Duration) (int, error) {
 	request := &internal.SyncTopicConfigRequestHeader{}
 	request.FromBrokerAddr = fromBrokerAddr
