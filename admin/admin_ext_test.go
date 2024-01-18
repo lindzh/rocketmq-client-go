@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"context"
 	"encoding/json"
 	"fmt"
 	"github.com/apache/rocketmq-client-go/v2/internal"
@@ -211,7 +210,7 @@ func TestAdminSendMessage(t *testing.T) {
 		QueueId:    0,
 	}
 
-	ret, err1 := admin.SyncSendMessage(context.Background(), &addr, mq, msg, TIMEOUT)
+	ret, err1 := admin.SyncSendMessage(&addr, mq, msg, TIMEOUT)
 	if err1 != nil {
 		t.Fatal(err1)
 		fmt.Printf("send message error: %v\r\n", err1)
