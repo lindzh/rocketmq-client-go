@@ -79,8 +79,8 @@ type SyncNameSrvKVConfigRequestHeader struct {
 
 func (header *SyncNameSrvKVConfigRequestHeader) Encode() map[string]string {
 	maps := make(map[string]string)
-	maps["fromNameServerAddr"] = header.FromNameSrvAddr
-	maps["syncTimeoutMillis"] = strconv.FormatInt(header.SyncTimeoutMills, 10)
+	maps["fromNameSrvAddr"] = header.FromNameSrvAddr
+	maps["syncTimeoutMills"] = strconv.FormatInt(header.SyncTimeoutMills, 10)
 	return maps
 }
 
