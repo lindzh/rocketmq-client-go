@@ -65,6 +65,8 @@ const (
 	ReqUpdateBrokerRole                  = int16(299)
 	ReqGetConsumerRunningInfo            = int16(307)
 	ReqConsumeMessageDirectly            = int16(309)
+	ReqUpdateNameSrvConfig               = int16(318)
+	ReqGetNameSrvConfig                  = int16(319)
 	ReqSendReplyMessage                  = int16(324)
 	ReqSendReplyMessageV2                = int16(325)
 	ReqPushReplyMessageToClient          = int16(326)

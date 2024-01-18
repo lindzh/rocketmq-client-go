@@ -166,6 +166,40 @@ func (a *AdminExt) GetKvConfig(nameSrvAddr *string, namespace string, key string
 	return responseHeader.Value, nil
 }
 
+func (a *AdminExt) GetNameSrvConfig(nameSrvAddr *string, timeoutMills time.Duration) (map[string]string, error) {
+	request := &internal.NoParameterRequestHeader{}
+	cmd := remote.NewRemotingCommand(internal.ReqGetNameSrvConfig, request, nil)
+	res, err := a.cli.InvokeSync(context.Background(), *nameSrvAddr, cmd, timeoutMills)
+	if err != nil {
+		return nil, err
+	}
+	if res.Code != internal.ResSuccess {
+		return nil, fmt.Errorf("update config fail name srv response code: %d, remarks: %s", res.Code, res.Remark)
+	}
+	p, err := properties.LoadString(string(res.Body))
+	if err != nil {
+		return nil, err
+	}
+	return p.Map(), nil
+}
+
+func (a *AdminExt) UpdateNameSrvConfig(nameSrvAddr *string, config map[string]string, timeoutMills time.Duration) error {
+	p := properties.LoadMap(config)
+	value := p.String()
+	body := []byte(value)
+	request := &internal.NoParameterRequestHeader{}
+	cmd := remote.NewRemotingCommand(internal.ReqUpdateNameSrvConfig, request, body)
+	ctx, _ := context.WithTimeout(context.Background(), timeoutMills)
+	res, err := a.cli.InvokeSync(ctx, *nameSrvAddr, cmd, timeoutMills)
+	if err != nil {
+		return err
+	}
+	if res.Code != internal.ResSuccess {
+		return fmt.Errorf("update config fail name srv response code: %d, remarks: %s", res.Code, res.Remark)
+	}
+	return nil
+}
+
 func (a *AdminExt) GetBrokerConfig(brokerAddr *string, timeoutMills time.Duration) (map[string]string, error) {
 	request := &internal.NoParameterRequestHeader{}
 	cmd := remote.NewRemotingCommand(internal.ReqGetBrokerConfig, request, nil)
